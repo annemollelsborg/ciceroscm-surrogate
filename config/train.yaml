@@ -1,8 +1,8 @@
 general:
-  data_id: /Users/ame/ciceroscm-surrogate/data/20250930_223742
-  device: cuda
+  data_id: /Users/ame/ciceroscm-surrogate/data/20251227_161736
+  device: mps
 model:
-  model_type: gru
+  model_type: tcn
   hidden_dims: 128
   num_layers: 1
   lr: 0.001
