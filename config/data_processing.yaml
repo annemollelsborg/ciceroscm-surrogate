@@ -1,5 +1,5 @@
 data_processing_params:
-  data_dir: /home/obola/repositories/cicero-scm-surrogate/data/20250930_223742
+  data_dir: /Users/ame/ciceroscm-surrogate/data/20250930_223742
   window_size: 65
   split:
     train: 0.7

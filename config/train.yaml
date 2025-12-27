@@ -1,5 +1,5 @@
 general:
-  data_id: /home/obola/repositories/cicero-scm-surrogate/data/20250930_223742
+  data_id: /Users/ame/ciceroscm-surrogate/data/20250930_223742
   device: cuda
 model:
   model_type: gru

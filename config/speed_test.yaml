@@ -1,5 +1,5 @@
 speed_test:
-  data_run: /home/obola/repositories/cicero-scm-surrogate/data/20250930_223742
+  data_run: /Users/ame/ciceroscm-surrogate/data/20250930_223742
   training_run: training_runs/20251002_081632_gru_128_1
   use_half: false
   autocast: false

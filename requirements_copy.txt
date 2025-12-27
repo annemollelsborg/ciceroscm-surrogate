@@ -1,0 +1,15 @@
+cx_Freeze
+gymnasium
+matplotlib
+numpy
+pandas
+pytest
+PyYAML
+ray
+Requests
+scikit-learn
+scipy
+setuptools
+torch
+tqdm
+xarray

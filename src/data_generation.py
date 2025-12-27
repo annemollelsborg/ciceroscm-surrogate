@@ -23,7 +23,7 @@ class DataGenerationPipeline:
 
     def __init__(self):
         # Load configs
-        cicero_config = load_yaml_config("cicero-scm.yaml")
+        cicero_config = load_yaml_config("cicero_scm.yaml")
         data_generation_config = load_yaml_config("data_generation.yaml", "data_generation_params")
 
         self.cicero_config = cicero_config
