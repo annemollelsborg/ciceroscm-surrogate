@@ -5,8 +5,6 @@ This repository supports automatic device detection to run on all hardware platf
 - **Apple Silicon GPUs** (MPS - Metal Performance Shaders)
 - **CPU** (fallback)
 
-## Quick Start
-
 The repository uses automatic device detection by default. No changes to how the code is usual run:
 
 ```bash
