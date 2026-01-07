@@ -1,9 +1,10 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 
 import numpy as np
 import torch
 
 from src.model import GRUSurrogate, LSTMSurrogate, TCNForecaster
+from src.utils.device_utils import get_device
 
 
 def parse_model_config(model_cfg: Dict) -> Tuple[str, int, int, int]:
@@ -25,10 +26,14 @@ def instantiate_model(
     num_layers: int,
     *,
     kernel_size: int = 3,
-    device: str = "cpu",
+    device: Union[str, torch.device] = "auto",
     freeze: bool = False,
 ) -> torch.nn.Module:
-    device = torch.device(device)
+    # Auto-detect or use specified device
+    if isinstance(device, str):
+        device = get_device(device, verbose=False)
+    elif not isinstance(device, torch.device):
+        device = torch.device(device)
     model_type = model_type.lower()
     if model_type == "lstm":
         model = LSTMSurrogate(n_gas=n_gas, hidden=hidden, num_layers=num_layers)
@@ -68,6 +73,10 @@ def load_state_dict(
     return model
 
 
-def numpy_state_to_torch(state_dict_np: Dict[str, np.ndarray], device: str) -> Dict[str, torch.Tensor]:
-    device = torch.device(device)
+def numpy_state_to_torch(state_dict_np: Dict[str, np.ndarray], device: Union[str, torch.device]) -> Dict[str, torch.Tensor]:
+    # Auto-detect or use specified device
+    if isinstance(device, str):
+        device = get_device(device, verbose=False)
+    elif not isinstance(device, torch.device):
+        device = torch.device(device)
     return {k: torch.from_numpy(v).to(device) for k, v in state_dict_np.items()}

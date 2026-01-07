@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
+from src.utils.device_utils import should_pin_memory
+
 
 def load_processed_data(data_dir):
     data_dir = Path(data_dir)
@@ -77,7 +79,8 @@ def prepare_dataloaders(
     val_ds = _to_dataset(X_val_norm, y_val)
     test_ds = _to_dataset(X_test_norm, y_test)
 
-    pin_memory = device.type == "cuda"
+    # Use device-aware pinned memory configuration
+    pin_memory = should_pin_memory(device)
     persistent_workers = num_workers > 0
 
     train_loader = data.DataLoader(

@@ -1,6 +1,6 @@
 general:
   data_id: /Users/ame/ciceroscm-surrogate/data/20251227_161736
-  device: mps
+  device: auto  # auto-detect best device: cuda > mps > cpu
 model:
   model_type: tcn
   hidden_dims: 128

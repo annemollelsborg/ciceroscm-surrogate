@@ -15,6 +15,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from marl_env_step import CICERONetEngine, CICEROSCMEngine
 from src.utils.config_utils import load_yaml_config
 from src.utils.data_utils import determine_variable_gases
+from src.utils.device_utils import get_device, synchronize_device
 from src.utils.model_utils import instantiate_model, parse_model_config, load_state_dict
 
 class SpeedTestPipeline:
@@ -35,10 +36,12 @@ class SpeedTestPipeline:
         if not self.training_run.exists():
             raise FileNotFoundError(f"Training run directory not found: {self.training_run}")
 
+        # Detect available devices
         self.cuda_available = torch.cuda.is_available()
+        self.mps_available = torch.backends.mps.is_available()
 
-        self.use_half = bool(config["use_half"]) and self.cuda_available
-        self.autocast = bool(config["autocast"]) and self.cuda_available
+        self.use_half = bool(config["use_half"])
+        self.autocast = bool(config["autocast"])
         self.max_samples = int(config["max_samples"])
         self.warmup_steps = int(config["warmup_steps"])
 
@@ -131,8 +134,9 @@ class SpeedTestPipeline:
 
     @staticmethod
     def _sync_device(device: str):
-        if device.startswith("cuda"):
-            torch.cuda.synchronize()
+        """Synchronize device to ensure accurate timing measurements."""
+        device_obj = torch.device(device)
+        synchronize_device(device_obj)
 
     def _scenario_iterator(self):
         for scenario in self.scenarios:
@@ -239,6 +243,11 @@ class SpeedTestPipeline:
         if self.cuda_available:
             surrogate_latencies["cuda"] = self._measure_surrogate_latencies(
                 device="cuda", use_half=self.use_half, autocast=self.autocast
+            )
+        if self.mps_available:
+            # MPS doesn't support half precision yet
+            surrogate_latencies["mps"] = self._measure_surrogate_latencies(
+                device="mps", use_half=False, autocast=False
             )
 
         if self.config['include_cicero_latencies'] == True:

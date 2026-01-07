@@ -16,6 +16,14 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.utils.config_utils import load_yaml_config
 from src.utils.data_utils import load_processed_data, prepare_dataloaders
+from src.utils.device_utils import (
+    get_device,
+    supports_amp,
+    get_autocast_context,
+    get_grad_scaler,
+    configure_device_optimizations,
+    print_device_info,
+)
 from src.utils.model_utils import instantiate_model, parse_model_config
 from src.utils.train_utils import validation_metrics
 
@@ -33,11 +41,16 @@ class TrainingPipeline:
         if not self.processed_path.exists():
             raise FileNotFoundError(f"Processed data not found at {self.processed_path}")
 
-        requested_device = self.general_cfg["device"]
-        if requested_device.startswith("cuda") and not torch.cuda.is_available():
-            raise RuntimeError("CUDA device requested but not available")
-        self.device = torch.device(requested_device)
-        self.use_amp = self.device.type == "cuda"
+        # Auto-detect or use specified device
+        requested_device = self.general_cfg.get("device", "auto")
+        self.device = get_device(requested_device, verbose=True)
+        print_device_info(self.device)
+
+        # Configure device-specific optimizations
+        configure_device_optimizations(self.device, verbose=True)
+
+        # Enable AMP only if device supports it
+        self.use_amp = supports_amp(self.device)
 
         hidden_cfg = self.model_cfg["hidden_dims"]
         if isinstance(hidden_cfg, (list, tuple)):
@@ -116,7 +129,7 @@ class TrainingPipeline:
         optimizer = self.build_optimizer(model)
         scheduler = self.build_scheduler(optimizer)
         criterion = nn.MSELoss()
-        scaler = torch.amp.GradScaler("cuda") if self.use_amp else None
+        scaler = get_grad_scaler(self.device, enabled=self.use_amp)
 
         progress = tqdm(range(1, self.epochs + 1), desc="epochs")
 
@@ -133,7 +146,7 @@ class TrainingPipeline:
                 yb = yb.to(self.device, non_blocking=True)
                 optimizer.zero_grad(set_to_none=True)
 
-                ctx = torch.amp.autocast("cuda") if self.use_amp else nullcontext()
+                ctx = get_autocast_context(self.device, enabled=self.use_amp)
                 with ctx:
                     preds = model(xb)
                     loss = criterion(preds, yb)

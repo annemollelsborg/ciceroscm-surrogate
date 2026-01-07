@@ -9,6 +9,12 @@ CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, CURR_DIR)
 
 from ciceroscm import CICEROSCM
+from utils.device_utils import (
+    get_device,
+    supports_half_precision,
+    get_autocast_context,
+    configure_device_optimizations,
+)
 
 class CICEROSCMEngine:
     """
@@ -98,7 +104,7 @@ class CICERONetEngine:
         self,
         historical_emissions,
         model,
-        device="cuda:0",
+        device="auto",  # Changed from "cuda:0" to "auto"
         mu=None,
         std=None,
         autocast=True,
@@ -107,15 +113,17 @@ class CICERONetEngine:
     ):
 
         self.window = int(window_size)
-        self.device = torch.device(device)
+        # Auto-detect or use specified device
+        self.device = get_device(device, verbose=False)
         self.model = model.eval().to(self.device)
-        self.use_half = bool(use_half) and (self.device.type == "cuda")
-        # Only enable autocast if we’re actually using half precision.
+
+        # Enable half precision only if device supports it
+        self.use_half = bool(use_half) and supports_half_precision(self.device)
+        # Only enable autocast if we're actually using half precision.
         self.autocast = bool(autocast) and self.use_half
 
-        # Fast kernels (safe no-ops on CPU)
-        torch.backends.cudnn.benchmark = True
-        torch.set_float32_matmul_precision("high")    
+        # Configure device-specific optimizations
+        configure_device_optimizations(self.device, verbose=False)    
 
         if historical_emissions.shape[0] < self.window:
             raise ValueError(
@@ -153,7 +161,8 @@ class CICERONetEngine:
 
         # Forward pass
         if self.autocast:
-            with torch.autocast(device_type="cuda", dtype=torch.float16):
+            ctx = get_autocast_context(self.device, enabled=True)
+            with ctx:
                 out = self.model(self.x)
         else:
             out = self.model(self.x)

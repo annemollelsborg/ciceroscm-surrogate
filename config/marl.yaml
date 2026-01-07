@@ -6,7 +6,7 @@ marl:
     marl_run_name: heterogenous_agents
     log_episode_trajectories: True       # master ON/OFF switch
     log_dir: marl_logs                # where to save .npz files (optional; set None to skip saving to disk)
-    surrogate_device: cuda
+    surrogate_device: auto  # auto-detect best device: cuda > mps > cpu
     surrogate_autocast: false
     surrogate_use_half: false
     random_seed: 2
