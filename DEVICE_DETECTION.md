@@ -118,7 +118,8 @@ Device information:
 
 The following files have been updated to support automatic device detection:
 
-### Core Modules
+Core modules:
+
 - `src/utils/device_utils.py` - **New** centralized device detection utility
 - `src/train.py` - Training pipeline with auto device detection
 - `src/marl_env_step.py` - MARL engines with device detection
@@ -126,11 +127,13 @@ The following files have been updated to support automatic device detection:
 - `src/utils/data_utils.py` - Device-aware data loaders
 - `src/speed_test.py` - Multi-device benchmarking
 
-### Configuration Files
+Configuration files:
+
 - `config/train.yaml` - Changed `device: mps` → `device: auto`
 - `config/marl.yaml` - Changed `surrogate_device: cuda` → `surrogate_device: auto`
 
-### Notebooks
+Notebooks:
+
 - `notebooks/rnn_based_surrogates.ipynb` - Auto device detection in all cells
 
 ## Examples
