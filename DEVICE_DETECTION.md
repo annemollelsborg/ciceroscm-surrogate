@@ -1,13 +1,13 @@
 # Cross-Platform Device Detection
 
-This repository now supports automatic device detection to run seamlessly on all hardware platforms:
+This repository supports automatic device detection to run on all hardware platforms:
 - **NVIDIA GPUs** (CUDA)
 - **Apple Silicon GPUs** (MPS - Metal Performance Shaders)
 - **CPU** (fallback)
 
 ## Quick Start
 
-The repository now uses automatic device detection by default. Simply run your code as usual:
+The repository uses automatic device detection by default. No changes to how the code is usual run:
 
 ```bash
 # Training will auto-detect the best available device
@@ -32,12 +32,12 @@ When device is set to `"auto"` (the default), the system selects devices in this
 
 ### Configuration Files
 
-All configuration files now use `device: auto` for automatic detection:
+All configuration files use `device: auto` for automatic detection:
 
 - `config/train.yaml` - Training pipeline configuration
 - `config/marl.yaml` - Multi-agent RL configuration
 
-You can still manually specify a device if needed:
+A device can still be specified manually if needed:
 
 ```yaml
 general:
@@ -90,12 +90,12 @@ Supports Half: False
 
 ## Device Utility Functions
 
-The new `src/utils/device_utils.py` module provides comprehensive device management:
+The new `src/utils/device_utils.py` module provides device management:
 
 ### Core Functions
 
 - **`get_device(device, verbose=True)`** - Get the best available PyTorch device
-- **`print_device_info(device)`** - Display detailed device information
+- **`print_device_info(device)`** - Display device information
 - **`configure_device_optimizations(device, verbose=True)`** - Apply device-specific optimizations
 
 ### Feature Detection
@@ -116,7 +116,7 @@ The new `src/utils/device_utils.py` module provides comprehensive device managem
 
 ## Updated Files
 
-The following files have been updated to support cross-platform execution:
+The following files have been updated to support automatic device detection:
 
 ### Core Modules
 - `src/utils/device_utils.py` - **New** centralized device detection utility
