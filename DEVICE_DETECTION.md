@@ -5,18 +5,7 @@ This repository supports automatic device detection to run on all hardware platf
 - **Apple Silicon GPUs** (MPS - Metal Performance Shaders)
 - **CPU** (fallback)
 
-The repository uses automatic device detection by default. No changes to how the code is usual run:
-
-```bash
-# Training will auto-detect the best available device
-python src/train.py
-
-# Speed tests will benchmark all available devices
-python src/speed_test.py
-
-# MARL experiments will use the best device
-python src/marl_experiment.py
-```
+Automatic device detection is used by default. No changes to how the code is usual run.
 
 ## How It Works
 
