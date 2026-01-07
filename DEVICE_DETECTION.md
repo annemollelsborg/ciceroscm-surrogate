@@ -92,25 +92,25 @@ Supports Half: False
 
 The new `src/utils/device_utils.py` module provides device management:
 
-### Core Functions
+Core functions:
 
 - **`get_device(device, verbose=True)`** - Get the best available PyTorch device
 - **`print_device_info(device)`** - Display device information
 - **`configure_device_optimizations(device, verbose=True)`** - Apply device-specific optimizations
 
-### Feature Detection
+Feature detection:
 
 - **`supports_amp(device)`** - Check if Automatic Mixed Precision is supported
 - **`supports_half_precision(device)`** - Check if FP16 is beneficial
 - **`should_pin_memory(device)`** - Check if pinned memory should be used
 
-### Training Utilities
+Training utilities:
 
 - **`get_autocast_context(device, enabled=True)`** - Get appropriate autocast context
 - **`get_grad_scaler(device, enabled=True)`** - Get gradient scaler for AMP
 - **`synchronize_device(device)`** - Synchronize device for accurate timing
 
-### Device Information
+Device information:
 
 - **`get_device_info(device)`** - Get detailed device specifications (dict)
 
