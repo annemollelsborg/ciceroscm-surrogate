@@ -48,29 +48,6 @@ general:
   device: auto      # Auto-detect (recommended)
 ```
 
-### Device-Specific Optimizations
-
-The system automatically enables appropriate optimizations for each device:
-
-#### CUDA (NVIDIA GPUs)
-- ✅ Automatic Mixed Precision (AMP) - on Volta+ GPUs (compute capability ≥ 7.0)
-- ✅ Half Precision (FP16) inference
-- ✅ cuDNN benchmark mode
-- ✅ TensorFloat-32 (TF32) matmul on Ampere+ GPUs
-- ✅ Pinned memory for faster CPU→GPU transfers
-
-#### MPS (Apple Silicon)
-- ✅ High precision matmul
-- ❌ AMP not supported yet
-- ❌ Half precision disabled (compatibility issues)
-- ❌ Pinned memory not beneficial
-
-#### CPU
-- ✅ High precision matmul
-- ❌ AMP not beneficial for performance
-- ❌ Half precision slower than FP32
-- ❌ Pinned memory not applicable
-
 ## Using Device Detection in Code
 
 ### Python Scripts
@@ -142,19 +119,19 @@ The new `src/utils/device_utils.py` module provides comprehensive device managem
 The following files have been updated to support cross-platform execution:
 
 ### Core Modules
-- ✅ `src/utils/device_utils.py` - **New** centralized device detection utility
-- ✅ `src/train.py` - Training pipeline with auto device detection
-- ✅ `src/marl_env_step.py` - MARL engines with device detection
-- ✅ `src/utils/model_utils.py` - Model instantiation with auto device
-- ✅ `src/utils/data_utils.py` - Device-aware data loaders
-- ✅ `src/speed_test.py` - Multi-device benchmarking
+- `src/utils/device_utils.py` - **New** centralized device detection utility
+- `src/train.py` - Training pipeline with auto device detection
+- `src/marl_env_step.py` - MARL engines with device detection
+- `src/utils/model_utils.py` - Model instantiation with auto device
+- `src/utils/data_utils.py` - Device-aware data loaders
+- `src/speed_test.py` - Multi-device benchmarking
 
 ### Configuration Files
-- ✅ `config/train.yaml` - Changed `device: mps` → `device: auto`
-- ✅ `config/marl.yaml` - Changed `surrogate_device: cuda` → `surrogate_device: auto`
+- `config/train.yaml` - Changed `device: mps` → `device: auto`
+- `config/marl.yaml` - Changed `surrogate_device: cuda` → `surrogate_device: auto`
 
 ### Notebooks
-- ✅ `notebooks/rnn_based_surrogates.ipynb` - Auto device detection in all cells
+- `notebooks/rnn_based_surrogates.ipynb` - Auto device detection in all cells
 
 ## Examples
 
@@ -245,142 +222,3 @@ model = instantiate_model(
     device="mps",
 )
 ```
-
-## Migration Guide
-
-If you have existing code that uses hardcoded devices, here's how to migrate:
-
-### Before (Mac-specific)
-```python
-device = "mps"
-model = model.to(device)
-```
-
-### After (Cross-platform)
-```python
-from src.utils.device_utils import get_device
-
-device = get_device("auto")
-model = model.to(device)
-```
-
-### Before (CUDA-specific with manual checks)
-```python
-device = "cuda" if torch.cuda.is_available() else "cpu"
-use_amp = device == "cuda"
-```
-
-### After (Cross-platform with auto-optimization)
-```python
-from src.utils.device_utils import get_device, supports_amp
-
-device = get_device("auto")
-use_amp = supports_amp(device)
-```
-
-## Performance Notes
-
-### CUDA (NVIDIA GPUs)
-- Best performance for large models and batch sizes
-- Supports TensorFloat-32 (TF32) on Ampere+ GPUs for 8x speedup
-- AMP provides ~2x speedup on Volta+ GPUs with minimal accuracy loss
-
-### MPS (Apple Silicon)
-- Excellent performance on M1/M2/M3 Macs
-- Typically 5-15x faster than CPU on Apple Silicon
-- No AMP support yet, but still very fast
-- Best for development and smaller models
-
-### CPU
-- Universal compatibility
-- Adequate for small models and inference
-- Good for debugging and testing
-- Slower than GPU options
-
-## Troubleshooting
-
-### Issue: "CUDA device requested but not available"
-**Solution**: The system will automatically fall back to CPU. No action needed. If you want to force a specific device, check that it's available first.
-
-### Issue: MPS not being detected on Mac
-**Solution**: Ensure you have:
-- macOS 12.3+ (Monterey)
-- Apple Silicon Mac (M1/M2/M3)
-- PyTorch 1.12+ with MPS support
-
-### Issue: Different results on different devices
-**Solution**: This is expected due to:
-- Floating-point precision differences
-- Different optimization kernels
-- Results should be similar within numerical tolerance
-
-## Advanced Usage
-
-### Custom Device Configuration
-
-```python
-from src.utils.device_utils import (
-    get_device,
-    configure_device_optimizations,
-    get_autocast_context,
-    get_grad_scaler,
-)
-
-# Initialize
-device = get_device("auto")
-configure_device_optimizations(device)
-
-# Training loop with device-aware features
-scaler = get_grad_scaler(device, enabled=True)
-autocast_ctx = get_autocast_context(device, enabled=True)
-
-for batch in dataloader:
-    with autocast_ctx:
-        output = model(batch)
-        loss = criterion(output, target)
-
-    if scaler is not None:
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
-    else:
-        loss.backward()
-        optimizer.step()
-```
-
-### Benchmarking Specific Devices
-
-```python
-from src.utils.device_utils import get_device, synchronize_device
-import time
-
-device = get_device("cuda")
-
-# Accurate timing
-synchronize_device(device)
-start = time.perf_counter()
-
-# ... model inference ...
-
-synchronize_device(device)
-elapsed = time.perf_counter() - start
-print(f"Inference time: {elapsed:.4f}s")
-```
-
-## Benefits of This Implementation
-
-1. **Zero configuration needed** - Works out of the box on any system
-2. **Optimal performance** - Automatically uses best available hardware
-3. **Development flexibility** - Easy to switch between devices for testing
-4. **Production ready** - Handles device availability gracefully
-5. **Future proof** - Easy to add support for new accelerators (e.g., AMD ROCm, Intel Arc)
-
-## Future Enhancements
-
-Potential future improvements:
-
-- [ ] Add support for AMD GPUs (ROCm)
-- [ ] Add support for Intel Arc GPUs
-- [ ] Implement distributed multi-GPU training
-- [ ] Add device performance profiling
-- [ ] Create device-specific model optimization presets
