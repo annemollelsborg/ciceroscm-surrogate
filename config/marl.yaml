@@ -1,8 +1,8 @@
 marl:
   general:
-    data_dir: /Users/ame/ciceroscm-surrogate/data/20250930_223742
+    data_dir: /Users/ame/ciceroscm-surrogate/data/20251227_161736
     climate_engine: net
-    training_run_id: 20251006_125016_tcn_128_5
+    training_run_id: 20251227_172356_tcn_128_5
     marl_run_name: heterogenous_agents
     log_episode_trajectories: True       # master ON/OFF switch
     log_dir: marl_logs                # where to save .npz files (optional; set None to skip saving to disk)
@@ -76,7 +76,7 @@ marl:
         num_env_runners: 1
         num_envs_per_runner: 32
         fragment_length: auto
-        num_gpus_per_env_runner: 1
+        num_gpus_per_env_runner: 0 # 1 -> 0
         sample_timeout_s: 1200
       resources:
-        num_gpus: 1
+        num_gpus: 0 # 1 -> 0

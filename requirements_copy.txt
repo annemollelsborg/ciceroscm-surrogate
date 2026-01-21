@@ -1,11 +1,14 @@
 cx_Freeze
+dm-tree
 gymnasium
+lz4
 matplotlib
 numpy
 pandas
+pyarrow
 pytest
 PyYAML
-ray
+ray[tune]
 Requests
 scikit-learn
 scipy

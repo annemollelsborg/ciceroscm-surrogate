@@ -20,4 +20,4 @@ conc_data_last: 2100
 em_data_start: 1900
 em_data_policy: 2015
 em_data_end: 2075
-test_data_dir: /home/obola/repositories/cicero-scm-surrogate/ciceroscm/tests/test-data
+test_data_dir: /Users/ame/ciceroscm-surrogate/ciceroscm/tests/test-data
